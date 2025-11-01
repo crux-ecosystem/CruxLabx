@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { useState } from "react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const navItems = [
 	{ href: "/", label: "Home" },
-	{ href: "/about", label: "About" },
-	{ href: "/projects", label: "Projects" },
+	{ href: "/about", label: "Community" },
+	{ href: "/models", label: "Models" },
 	{ href: "/docs", label: "Docs" },
 	{ href: "/research", label: "Research" },
 	{ href: "/contact", label: "Contact" },
@@ -19,9 +20,11 @@ export default function Navbar() {
 		<header className="sticky top-0 z-50 border-b backdrop-blur supports-[backdrop-filter]:bg-background/70">
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="h-16 flex items-center justify-between">
-					<Link href="/" className="text-lg font-semibold tracking-tight">
-						<span className="text-foreground">Crux</span>
-						<span className="text-primary">Labx</span>
+					<Link href="/" className="flex items-center gap-3">
+						<span className="text-2xl font-semibold tracking-tight">
+							<span className="text-foreground">Crux</span>
+							<span className="text-red-500">Labx</span>
+						</span>
 					</Link>
 					<nav className="hidden md:flex items-center gap-6 text-sm">
 						{navItems.map((item) => (
@@ -29,6 +32,7 @@ export default function Navbar() {
 								{item.label}
 							</Link>
 						))}
+						<ThemeToggle />
 					</nav>
 					<button
 						className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-foreground/80 hover:text-primary"
@@ -52,6 +56,7 @@ export default function Navbar() {
 								{item.label}
 							</Link>
 						))}
+						<div className="pt-2"><ThemeToggle /></div>
 					</div>
 				</div>
 			)}

@@ -1,0 +1,225 @@
+# IntraMind Documentation
+
+Welcome to the IntraMind documentation. Learn how to deploy, configure, and use IntraMind for your organization.
+
+## What is IntraMind?
+
+IntraMind is a **local intelligence system** that transforms your organization's internal documents into a smart, searchable knowledge network. It runs entirely on your infrastructure, ensuring complete data privacy while delivering AI-powered insights.
+
+### Key Features
+
+- **🔒 Privacy-First**: All data stays within your network
+- **⚡ Offline-Capable**: Works without internet connectivity
+- **🧠 AI-Powered**: Uses advanced LLMs for intelligent responses
+- **📄 Multi-Format**: Supports PDF, DOCX, images, and scanned documents
+- **🔍 Smart Search**: Semantic search with vector embeddings
+- **🏢 Enterprise-Ready**: Designed for institutional deployment
+
+## Installation
+
+### Prerequisites
+
+- Python 3.9 or higher
+- 8GB RAM minimum (16GB recommended)
+- 10GB free disk space
+- Ollama installed (for local LLM)
+
+### Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/crux-ecosystem/IntraMind-Showcase.git
+cd IntraMind-Showcase
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure your settings
+cp config.example.yaml config.yaml
+
+# Start IntraMind
+python main.py
+```
+
+## Configuration
+
+### Basic Configuration
+
+Edit `config.yaml` to customize IntraMind:
+
+```yaml
+model:
+  embedding: "all-MiniLM-L6-v2"
+  llm: "llama3"
+  
+storage:
+  vector_db: "chromadb"
+  documents_path: "./documents"
+  
+server:
+  host: "0.0.0.0"
+  port: 8080
+  lan_only: true
+```
+
+### Embedding Models
+
+Choose from various embedding models based on your needs:
+
+- **all-MiniLM-L6-v2**: Fast, lightweight (80MB)
+- **all-mpnet-base-v2**: Higher quality (420MB)
+- **multi-qa-MiniLM-L6-cos-v1**: Optimized for Q&A
+
+### LLM Options
+
+IntraMind supports multiple LLMs via Ollama:
+
+- **llama3**: Balanced performance (8B parameters)
+- **mistral**: Faster inference (7B parameters)
+- **llama3:70b**: Highest quality (70B parameters)
+- **codellama**: Optimized for technical documentation
+
+## Usage
+
+### Adding Documents
+
+Place your documents in the configured documents folder:
+
+```bash
+# Add documents to the default folder
+cp /path/to/your/documents/* ./documents/
+
+# Trigger re-indexing
+python main.py --reindex
+```
+
+### Querying
+
+Access the web interface at `http://localhost:8080` or use the API:
+
+```python
+import requests
+
+response = requests.post('http://localhost:8080/api/query', json={
+    'query': 'What is our company policy on remote work?'
+})
+
+print(response.json()['answer'])
+```
+
+## Architecture
+
+### System Components
+
+1. **Document Ingestion**: Processes PDFs, DOCX, images with OCR
+2. **Text Extraction**: Normalizes and chunks documents
+3. **Embedding Generation**: Creates vector representations
+4. **Vector Storage**: Stores embeddings in ChromaDB
+5. **Query Engine**: Retrieves relevant context
+6. **LLM Inference**: Generates answers using local models
+7. **Response Formatting**: Presents results with citations
+
+### Data Flow
+
+```
+Documents → Ingestion → Chunking → Embeddings → Vector DB
+                                                      ↓
+User Query → Embedding → Similarity Search → Context Assembly
+                                                      ↓
+                                            LLM → Answer + Citations
+```
+
+## Deployment
+
+### LAN Deployment
+
+For internal network deployment:
+
+1. Set `lan_only: true` in config
+2. Configure firewall rules
+3. Set up SSL certificates (optional)
+4. Deploy on internal server
+
+### Docker Deployment
+
+```bash
+# Build the image
+docker build -t intramind .
+
+# Run the container
+docker run -d -p 8080:8080 -v ./documents:/app/documents intramind
+```
+
+## API Reference
+
+### Query Endpoint
+
+**POST** `/api/query`
+
+Request:
+```json
+{
+  "query": "Your question here",
+  "max_results": 5
+}
+```
+
+Response:
+```json
+{
+  "answer": "Generated answer",
+  "sources": [
+    {
+      "document": "filename.pdf",
+      "page": 3,
+      "relevance": 0.95
+    }
+  ]
+}
+```
+
+### Health Check
+
+**GET** `/api/health`
+
+Returns system status and available models.
+
+## Troubleshooting
+
+### Common Issues
+
+**Issue**: Slow query responses
+- **Solution**: Reduce document chunk size or use a smaller embedding model
+
+**Issue**: Out of memory errors
+- **Solution**: Increase system RAM or use a smaller LLM model
+
+**Issue**: Documents not being indexed
+- **Solution**: Check file permissions and supported formats
+
+## Best Practices
+
+1. **Document Organization**: Structure documents in logical folders
+2. **Regular Updates**: Re-index when adding new documents
+3. **Model Selection**: Choose models based on your hardware
+4. **Monitoring**: Set up logging and performance monitoring
+5. **Backup**: Regularly backup vector database and configurations
+
+## Security
+
+- All data processing happens locally
+- No external API calls (except optional fallback)
+- Network isolation recommended
+- Regular security updates via GitHub
+
+## Support
+
+- **GitHub**: [crux-ecosystem/IntraMind-Showcase](https://github.com/crux-ecosystem/IntraMind-Showcase)
+- **Issues**: Report bugs on GitHub Issues
+- **Documentation**: This page and README.md
+
+## Next Steps
+
+1. Explore the [Models](/models) page to see IntraMind in action
+2. Check the [Research](/research) page for technical details
+3. Visit our [GitHub repository](https://github.com/crux-ecosystem/IntraMind-Showcase) for updates

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://cruxlabx.vercel.app/sitemap.xml
