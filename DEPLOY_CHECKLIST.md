@@ -15,40 +15,51 @@
 3. Select: `crux-ecosystem/CruxLabx`
 4. Click "Import"
 
-### 2. Add Vercel Postgres Database
-**IMPORTANT: Do this BEFORE deploying!**
+### 2. Add Environment Variables (Required Before First Deploy)
+Click "Environment Variables" tab and add these:
 
-1. In the import screen, click "Storage" tab
-2. Click "Create Database" → "Postgres"
-3. Name: `cruxlabx-db`
-4. Region: Choose closest to your users (e.g., `us-east-1`)
-5. Click "Create"
+```
+RESEND_API_KEY = re_3ufFv4v1_5toCQbT15xcBuUd9yRRySuv2
+CONTACT_EMAIL = cruxlabx@gmail.com
+NEXT_PUBLIC_HCAPTCHA_SITE_KEY = ff28c150-363c-43ac-aaf4-a7a23916092c
+HCAPTCHA_SECRET_KEY = [Your hCaptcha secret key from .env.local]
+NEXT_PUBLIC_SITE_URL = https://cruxlabx.vercel.app
+```
 
-Vercel will automatically add these variables:
+**Note:** Copy the `HCAPTCHA_SECRET_KEY` value from your `.env.local` file.
+**Note:** You can update `NEXT_PUBLIC_SITE_URL` after deployment with your actual URL.
+
+### 3. Deploy First Time
+1. Click "Deploy" button
+2. Wait 2-3 minutes for build to complete
+3. Your site is now live! 🎉
+
+### 4. Add Vercel Postgres Database (After First Deploy)
+**Now add the database:**
+
+1. Go to your project dashboard: https://vercel.com/dashboard
+2. Click on your `CruxLabx` project
+3. Click "Storage" tab at the top
+4. Click "Create Database"
+5. Select "Postgres"
+6. Click "Continue"
+7. Name: `cruxlabx-db`
+8. Region: Choose closest to your users (e.g., `Washington, D.C., USA (iad1)`)
+9. Click "Create"
+
+Vercel will automatically add these environment variables to your project:
 - ✅ `POSTGRES_URL`
 - ✅ `POSTGRES_PRISMA_URL`
 - ✅ `POSTGRES_URL_NON_POOLING`
 - ✅ `DATABASE_URL`
 
-### 3. Add Environment Variables
-Click "Environment Variables" tab and add:
+### 5. Redeploy to Use Database
+After adding the database:
 
-```
-RESEND_API_KEY = re_3ufFv4v1_5toCQbT15xcBuUd9yRRySuv2
-CONTACT_EMAIL = cruxlabx@gmail.com
-NEXT_PUBLIC_HCAPTCHA_SITE_KEY = [Your hCaptcha site key]
-HCAPTCHA_SECRET_KEY = [Your hCaptcha secret key]
-NEXT_PUBLIC_SITE_URL = https://cruxlabx.vercel.app
-```
-
-**Note:** Update `NEXT_PUBLIC_SITE_URL` with your actual Vercel URL after deployment.
-
-### 4. Deploy
-1. Click "Deploy" button
-2. Wait 2-3 minutes for build to complete
-3. Click "Visit" to see your live site!
-
-### 5. Initialize Database Schema
+1. Go to "Deployments" tab
+2. Click the "..." menu on the latest deployment
+3. Click "Redeploy"
+4. OR just push a new commit to trigger auto-deploy
 After first deployment:
 
 **Option A: Via Vercel Dashboard**
@@ -68,7 +79,29 @@ vercel env pull .env.production
 npx prisma db push
 ```
 
-### 6. Test Your Deployment
+### 6. Initialize Database Schema
+After adding the database and redeploying:
+
+**Option A: Automatic (Recommended)**
+The database schema should be automatically created on the next deployment.
+
+**Option B: Manual Push via CLI**
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Login and link to your project
+vercel login
+vercel link
+
+# Pull environment variables (includes DATABASE_URL from Postgres)
+vercel env pull .env.production
+
+# Push database schema
+npx prisma db push
+```
+
+### 7. Test Your Deployment
 
 #### Test Contact Form:
 1. Visit: `https://[your-app].vercel.app/contact`
