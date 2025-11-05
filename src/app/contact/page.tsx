@@ -61,8 +61,8 @@ export default function ContactPage() {
 				{status && <p className="text-sm text-foreground/70">{status}</p>}
 				<p className="text-sm text-foreground/70">
 					Or email directly:{" "}
-					<a className="text-primary hover:underline" href="mailto:contact@cruxlabx.com">
-						contact@cruxlabx.com
+					<a className="text-primary hover:underline" href="mailto:cruxlabx@gmail.com">
+						cruxlabx@gmail.com
 					</a>
 				</p>
 			</div>
