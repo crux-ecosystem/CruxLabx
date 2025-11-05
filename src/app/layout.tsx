@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import RouteBlurOverlay from "@/components/RouteBlurOverlay";
+import AdminConsoleAccess from "@/components/AdminConsoleAccess";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -40,6 +41,7 @@ export default function RootLayout({
   return (
 		<html lang="en" className="dark">
 			<body suppressHydrationWarning className={`${spaceGrotesk.variable} antialiased bg-background text-foreground`}> 
+				<AdminConsoleAccess />
 				<RouteBlurOverlay />
 				<div className="relative min-h-dvh flex flex-col">
 					<Navbar />

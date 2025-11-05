@@ -28,6 +28,10 @@ yarn-error.log*
 .env*.local
 .env
 
+# database
+prisma/*.db
+prisma/*.db-journal
+
 # vercel
 .vercel
 
@@ -37,3 +41,5 @@ next-env.d.ts
 
 # sentry
 .sentryclirc
+
+.vercel

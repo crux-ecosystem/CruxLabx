@@ -4,8 +4,8 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 export default function NeuralThreeBG() {
-	const containerRef = useRef<HTMLDivElement | null>(null);
-	const cleanupRef = useRef<() => void>();
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const cleanupRef = useRef<(() => void) | null>(null);
 
 	useEffect(() => {
 		if (!containerRef.current) return;
@@ -60,7 +60,7 @@ export default function NeuralThreeBG() {
 		};
 		window.addEventListener("resize", onResize);
 
-		cleanupRef.current = () => {
+        cleanupRef.current = () => {
 			cancelAnimationFrame(raf);
 			window.removeEventListener("resize", onResize);
 			geometry.dispose();
@@ -71,7 +71,7 @@ export default function NeuralThreeBG() {
 			}
 		};
 
-		return () => cleanupRef.current?.();
+        return () => cleanupRef.current?.();
 	}, []);
 
 	return <div ref={containerRef} className="pointer-events-none absolute inset-0 -z-10" />;

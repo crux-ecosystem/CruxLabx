@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { prisma } from "@/lib/db";
+import { getAdminNotificationEmail, getThankYouEmail } from "@/lib/email-templates";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -37,51 +39,75 @@ export async function POST(req: Request) {
 			return NextResponse.json({ error: "Captcha verification failed" }, { status: 400 });
 		}
 
-		// Send email using Resend
-		const toEmail = process.env.CONTACT_EMAIL || process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@cruxlabx.com";
-		const fromEmail = process.env.FROM_EMAIL || "onboarding@resend.dev"; // Default Resend test email
+		// Store in database
+		try {
+			await prisma.contactSubmission.create({
+				data: {
+					name,
+					email,
+					message,
+				},
+			});
+		} catch (dbError) {
+			console.error("Database error:", dbError);
+			// Continue even if database fails - we still want to send emails
+		}
 
+		// Email configuration
+		const toEmail = process.env.CONTACT_EMAIL || process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@cruxlabx.com";
+		const fromEmail = process.env.FROM_EMAIL || "onboarding@resend.dev";
+
+		let adminEmailSent = false;
+		let userEmailSent = false;
+
+		// Send emails using Resend
 		if (resend) {
 			try {
-				const { data, error } = await resend.emails.send({
+				// 1. Send notification email to admin
+				const adminEmailTemplate = getAdminNotificationEmail(name, email, message);
+				const { data: adminData, error: adminError } = await resend.emails.send({
 					from: fromEmail,
 					to: [toEmail],
-					reply_to: email,
-					subject: `Contact Form Submission from ${name}`,
-					html: `
-						<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-							<h2 style="color: #66FCF1; margin-bottom: 20px;">New Contact Form Submission</h2>
-							<div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-								<p style="margin: 10px 0;"><strong>From:</strong> ${name}</p>
-								<p style="margin: 10px 0;"><strong>Email:</strong> ${email}</p>
-								<p style="margin: 10px 0;"><strong>Message:</strong></p>
-								<div style="background: white; padding: 15px; border-radius: 4px; margin-top: 10px;">
-									<p style="white-space: pre-wrap; margin: 0;">${message}</p>
-								</div>
-							</div>
-							<p style="color: #666; font-size: 12px; margin-top: 30px;">
-								This email was sent from the CruxLabx contact form.
-							</p>
-						</div>
-					`,
-					text: `New Contact Form Submission\n\nFrom: ${name} (${email})\n\nMessage:\n${message}`,
+					replyTo: email,
+					subject: adminEmailTemplate.subject,
+					html: adminEmailTemplate.html,
+					text: adminEmailTemplate.text,
 				});
 
-				if (error) {
-					console.error("Resend API error:", error);
-					// Continue to return success for graceful degradation
+				if (adminError) {
+					console.error("Admin email error:", adminError);
+				} else {
+					adminEmailSent = true;
+					console.log("Admin notification sent:", adminData);
+				}
+
+				// 2. Send thank you email to user
+				const thankYouTemplate = getThankYouEmail(name);
+				const { data: userData, error: userError } = await resend.emails.send({
+					from: fromEmail,
+					to: [email],
+					subject: thankYouTemplate.subject,
+					html: thankYouTemplate.html,
+					text: thankYouTemplate.text,
+				});
+
+				if (userError) {
+					console.error("User thank you email error:", userError);
+				} else {
+					userEmailSent = true;
+					console.log("Thank you email sent:", userData);
 				}
 			} catch (emailError) {
 				console.error("Email sending error:", emailError);
-				// Continue to return success for graceful degradation
 			}
 		} else {
-			console.warn("Resend API key not configured. Email not sent.");
+			console.warn("Resend API key not configured. Emails not sent.");
 		}
 
 		return NextResponse.json({ 
 			ok: true,
-			message: "Your message has been sent successfully!" 
+			message: "Thank you for your message! We'll get back to you soon.",
+			emailsSent: { admin: adminEmailSent, user: userEmailSent }
 		});
 
 	} catch (error) {

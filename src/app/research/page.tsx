@@ -3,7 +3,8 @@ import Reveal from "@/components/Reveal";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import TerminalCard from "@/components/TerminalCard";
-import { ExternalLink, GitBranch, FileText, Cpu, Database, Network } from "lucide-react";
+import { ExternalLink, GitBranch, FileText, Cpu, Database, Network, BookOpen, Calendar } from "lucide-react";
+import { researchPapers, blogPosts, roadmapVersions } from "@/content/research";
 
 async function getReleases() {
 	try {
@@ -193,6 +194,91 @@ for source in response.sources:
 				</Reveal>
 			</section>
 
+			{/* Research Papers */}
+			{researchPapers.length > 0 && (
+				<section className="mt-12">
+					<Reveal>
+						<h2 className="text-2xl md:text-3xl font-semibold font-[var(--font-display)] mb-6">Research Papers</h2>
+					</Reveal>
+					<Reveal delay={0.05}>
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							{researchPapers.map((paper, idx) => (
+								<Card key={idx} className="p-5 hover:border-primary/50 transition-colors">
+									<div className="flex items-start gap-3">
+										<BookOpen className="h-5 w-5 text-primary flex-shrink-0 mt-1" />
+										<div className="flex-1">
+											<h3 className="font-semibold mb-2">{paper.title}</h3>
+											<p className="text-sm text-foreground/70 mb-3">{paper.description}</p>
+											<div className="flex items-center justify-between">
+												<div className="flex flex-wrap gap-1">
+													{paper.tags.map((tag) => (
+														<Badge key={tag} variant="secondary" className="text-xs">
+															{tag}
+														</Badge>
+													))}
+												</div>
+												<Link 
+													href={paper.link} 
+													target="_blank" 
+													rel="noopener noreferrer"
+													className="text-primary hover:underline flex items-center gap-1 text-sm"
+												>
+													Read
+													<ExternalLink className="h-3 w-3" />
+												</Link>
+											</div>
+											<p className="text-xs text-foreground/50 mt-2 flex items-center gap-1">
+												<Calendar className="h-3 w-3" />
+												{paper.date}
+											</p>
+										</div>
+									</div>
+								</Card>
+							))}
+						</div>
+					</Reveal>
+				</section>
+			)}
+
+			{/* Blog Posts */}
+			{blogPosts.length > 0 && (
+				<section className="mt-12">
+					<Reveal>
+						<h2 className="text-2xl md:text-3xl font-semibold font-[var(--font-display)] mb-6">Blog & Articles</h2>
+					</Reveal>
+					<Reveal delay={0.05}>
+						<div className="space-y-3">
+							{blogPosts.map((post, idx) => (
+								<Card key={idx} className="p-5 hover:border-primary/50 transition-colors">
+									<div className="flex items-start justify-between gap-4">
+										<div className="flex-1">
+											<h3 className="font-semibold mb-1">{post.title}</h3>
+											<p className="text-sm text-foreground/70 mb-2">{post.description}</p>
+											<div className="flex items-center gap-3 text-xs text-foreground/50">
+												<span className="flex items-center gap-1">
+													<Calendar className="h-3 w-3" />
+													{post.date}
+												</span>
+												{post.author && <span>• {post.author}</span>}
+											</div>
+										</div>
+										<Link 
+											href={post.link} 
+											target="_blank" 
+											rel="noopener noreferrer"
+											className="text-primary hover:underline flex items-center gap-1 text-sm flex-shrink-0"
+										>
+											Read
+											<ExternalLink className="h-4 w-4" />
+										</Link>
+									</div>
+								</Card>
+							))}
+						</div>
+					</Reveal>
+				</section>
+			)}
+
 			{/* Version Changelog */}
 			<section className="mt-12">
 				<Reveal>
@@ -200,50 +286,15 @@ for source in response.sources:
 				</Reveal>
 				<Reveal delay={0.05}>
 					<div className="space-y-4">
-						<ChangeItem 
-							version="v1.0.0" 
-							date="2025-10-31" 
-							status="completed"
-							items={[
-								"MVP architecture finalized (ingest, memory, reasoning, tools)",
-								"Initial research docs and diagrams",
-								"Local deployment baseline with Ollama integration",
-								"ChromaDB vector storage implementation",
-								"Web interface with FastAPI backend"
-							]} 
-						/>
-						<ChangeItem 
-							version="v0.9.0" 
-							date="2025-10-15" 
-							status="completed"
-							items={[
-								"Multi-format document support (PDF, DOCX, images)",
-								"OCR integration for scanned documents",
-								"Improved chunking strategies",
-								"Performance optimizations"
-							]} 
-						/>
-						<ChangeItem 
-							version="v0.8.0" 
-							date="2025-09-15" 
-							status="completed"
-							items={[
-								"Prototype retrieval and context engine",
-								"Subsystem logging pipeline",
-								"Basic RAG implementation"
-							]} 
-						/>
-						<ChangeItem 
-							version="v1.1.0" 
-							date="Q1 2026" 
-							status="planned"
-							items={[
-								"Multi-user support with authentication",
-								"Advanced analytics dashboard",
-								"Custom model fine-tuning support",
-								"Enhanced security features"
-							]} 
-						/>
+						{roadmapVersions.map((version, idx) => (
+							<ChangeItem 
+								key={idx}
+								version={version.version} 
+								date={version.date} 
+								status={version.status}
+								items={version.items} 
+							/>
+						))}
 					</div>
 				</Reveal>
 			</section>
